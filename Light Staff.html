@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIGHT • Formulário Staff</title>
+
+<style>
+:root{
+  --bg:#0b0f1a;
+  --card:rgba(20,28,45,0.85);
+  --accent:#ffb300;
+  --accent2:#ff4d00;
+  --text:#ffffff;
+  --radius:20px;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:
+    radial-gradient(1200px 600px at 20% -10%,rgba(255,179,0,0.35),transparent 60%),
+    radial-gradient(900px 600px at 95% 10%,rgba(255,77,0,0.25),transparent 60%),
+    linear-gradient(180deg,#05080f,var(--bg));
+  color:var(--text);
+}
+
+/* Banner */
+.banner{
+  height:270px;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.9)),
+    url("Banner-@light.png");
+  background-size:cover;
+  background-position:center;
+}
+
+.header{
+  text-align:center;
+  padding:25px;
+}
+
+.header h1{
+  margin:0;
+  font-size:28px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 0 25px rgba(255,140,0,0.4);
+}
+
+.container{
+  max-width:900px;
+  margin:30px auto 60px;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:30px;
+  box-shadow:
+    0 0 60px rgba(255,140,0,0.15),
+    0 0 120px rgba(255,77,0,0.08);
+  backdrop-filter:blur(15px);
+}
+
+label{
+  display:block;
+  margin-top:18px;
+  font-weight:600;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:#0b0f1a;
+  color:white;
+  font-size:14px;
+  transition:0.25s;
+}
+
+textarea{min-height:100px;resize:vertical}
+
+input:focus,textarea:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 30px rgba(255,140,0,0.25);
+}
+
+button{
+  width:100%;
+  padding:16px;
+  margin-top:30px;
+  border:none;
+  border-radius:16px;
+  font-weight:bold;
+  font-size:16px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 40px rgba(255,140,0,0.35);
+}
+
+.status{
+  margin-top:15px;
+  padding:14px;
+  border-radius:14px;
+  display:none;
+}
+
+.status.ok{
+  display:block;
+  background:rgba(0,255,100,0.15);
+}
+
+.status.err{
+  display:block;
+  background:rgba(255,0,0,0.15);
+}
+</style>
+</head>
+
+<body>
+
+<div class="banner"></div>
+<div class="header">
+  <h1>LIGHT • Formulário Staff</h1>
+</div>
+
+<div class="container">
+<div class="card">
+
+<form id="staffForm">
+
+<label>Nome</label>
+<input type="text" name="nome" required>
+
+<label>ID do Discord (modo desenvolvedor)</label>
+<input type="text" name="discordId" required placeholder="Ex: 123456789012345678">
+
+<label>Nick Minecraft</label>
+<input type="text" name="nick" required>
+
+<label>Idade</label>
+<input type="number" name="idade" required>
+
+<label>Discord (nome)</label>
+<input type="text" name="discord" required>
+
+<label>Tempo no servidor</label>
+<input type="text" name="tempoServidor" required>
+
+<label>Disponibilidade</label>
+<input type="text" name="disponibilidade" required>
+
+<label>Experiência como staff</label>
+<textarea name="exp" required></textarea>
+
+<label>Como lida com conflitos?</label>
+<textarea name="conflito" required></textarea>
+
+<label>Meta de parcerias por semana</label>
+<select name="metaParcerias" required>
+<option value="1-2">1-2</option>
+<option value="3-5">3-5</option>
+<option value="5+">5+</option>
+</select>
+
+<label>Por que devemos escolher você?</label>
+<textarea name="motivo" required></textarea>
+
+<button type="submit">Enviar Candidatura</button>
+<div id="status" class="status"></div>
+
+</form>
+
+</div>
+</div>
+
+<script>
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1472070031578890291/ZpP0NkPGK-3RZHIeazMi5QVrx6BWZAz58syzig3AuQgKaMW5cSJ18ulsQkxA-Jz1PIm7";
+
+const form = document.getElementById("staffForm");
+const statusBox = document.getElementById("status");
+
+function setStatus(type,msg){
+  statusBox.className="status "+type;
+  statusBox.textContent=msg;
+}
+
+form.addEventListener("submit",async(e)=>{
+  e.preventDefault();
+
+  const data=new FormData(form);
+  const mention = `<@${data.get("discordId")}>`;
+
+  const embed = {
+    title:"📋 Nova Candidatura • STAFF LIGHT",
+    color:16753920,
+    description:`👋 Candidato: ${mention}`,
+    fields:[
+      {name:"👤 Nome",value:data.get("nome"),inline:true},
+      {name:"🎮 Nick",value:data.get("nick"),inline:true},
+      {name:"🧠 Idade",value:data.get("idade"),inline:true},
+      {name:"💬 Discord",value:data.get("discord"),inline:true},
+      {name:"⏳ Tempo Servidor",value:data.get("tempoServidor"),inline:true},
+      {name:"📅 Disponibilidade",value:data.get("disponibilidade"),inline:false},
+      {name:"🛡 Experiência",value:data.get("exp"),inline:false},
+      {name:"⚖ Conflitos",value:data.get("conflito"),inline:false},
+      {name:"📊 Meta Parcerias",value:data.get("metaParcerias"),inline:true},
+      {name:"🔥 Motivo",value:data.get("motivo"),inline:false}
+    ],
+    footer:{text:"Formulário Staff • Light"},
+    timestamp:new Date()
+  };
+
+  try{
+    const res = await fetch(DISCORD_WEBHOOK_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        content: mention,
+        embeds:[embed]
+      })
+    });
+
+    if(!res.ok) throw new Error();
+
+    setStatus("ok","Candidatura enviada com sucesso.");
+    form.reset();
+  }catch{
+    setStatus("err","Erro ao enviar. Verifique o webhook.");
+  }
+});
+</script>
+
+</body>
+</html>
