@@ -1,2 +1,2 @@
-# Light-Formul-rio
+# Light-Formulário
 Requisitos para se tornar staff
